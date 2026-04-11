@@ -147,7 +147,7 @@ const StudentDashboard = () => {
     const a = document.createElement('a');
     a.href = url.startsWith('data:') ? url : `${API_URL}${url}`;
     
-    // Auto-detect extension from data URL or original URL
+    // Auto-detect extension
     let extension = '';
     if (url.startsWith('data:')) {
       const mime = url.match(/data:(.*?);/)?.[1];
@@ -160,7 +160,12 @@ const StudentDashboard = () => {
       if (parts.length > 1) extension = `.${parts.pop()}`;
     }
 
-    a.download = filename.includes('.') ? filename : `${filename}${extension}`;
+    // Handle names with dots (like initials) correctly
+    let cleanName = filename;
+    if (cleanName.endsWith('.')) cleanName = cleanName.slice(0, -1);
+    
+    const endsWithExtension = cleanName.match(/\.(pdf|jpg|jpeg|png|webp|xlsx)$/i);
+    a.download = endsWithExtension ? cleanName : `${cleanName}${extension}`;
     a.target = '_blank';
     a.click();
   };
