@@ -143,9 +143,24 @@ const StudentDashboard = () => {
 
 
   const downloadFile = (url, filename) => {
+    if (!url) return;
     const a = document.createElement('a');
-    a.href = url?.startsWith('data:') ? url : `${API_URL}${url}`;
-    a.download = filename;
+    a.href = url.startsWith('data:') ? url : `${API_URL}${url}`;
+    
+    // Auto-detect extension from data URL or original URL
+    let extension = '';
+    if (url.startsWith('data:')) {
+      const mime = url.match(/data:(.*?);/)?.[1];
+      if (mime === 'application/pdf') extension = '.pdf';
+      else if (mime === 'image/jpeg') extension = '.jpg';
+      else if (mime === 'image/png') extension = '.png';
+      else if (mime === 'image/webp') extension = '.webp';
+    } else {
+      const parts = url.split('.');
+      if (parts.length > 1) extension = `.${parts.pop()}`;
+    }
+
+    a.download = filename.includes('.') ? filename : `${filename}${extension}`;
     a.target = '_blank';
     a.click();
   };
